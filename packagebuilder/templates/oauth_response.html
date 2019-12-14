@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% load widget_tweaks %}
+
+{% block content %}
+
+	<h1>Salesforce package.xml Builder</h1>
+	<p>
+		This tool uses the Salesforce Metadata API to build a package.xml file based on components in your Salesforce org. Handy for building a package.xml file for use with ANT Force.com Migration or other IDE tools, or building a destructiveChanges.xml file.
+	</p>
+	<p>
+		Faster than having to download all the actual metadata in order to build your package.xml file.
+	</p>
+				
+	<table id="login_table">
+
+		<form action="." method="POST" id="loginForm"> {% csrf_token %}
+
+			<table class="login_table">
+
+				{% if messages %}
+
+					<tr>
+						<td colspan="2">
+							<div role="alert" class="alert alert-danger">
+							    {% for message in messages %}
+							    	{{ message }}<br/>
+							    {% endfor %}
+						    </div>
+						</td>
+					</tr>
+					
+				{% endif %}
+
+				{% if not error %}
+
+					<h2>Logged in as:</h2>
+
+						<tr>
+							<td width="150">
+								<strong>Username:</strong>
+							</td>
+							<td>
+								{{ username }}
+							</td>
+						</tr>
+
+						<tr>
+							<td width="150">
+								<strong>Organisation:</strong>
+							</td>
+							<td>
+								{{ org_name }}
+							</td>
+						</tr>
+
+						<tr>
+							<td colspan="2"><br/></td>
+						</tr>
+
+						<tr>
+							<td width="150">
+								<strong>Component Option:</strong>
+							</td>
+							<td>
+								{% render_field login_form.package_option class="form-control" %}
+							</td>
+						</tr>
+
+						<tr>
+							<td colspan="2"><br/></td>
+						</tr>
+
+					<tr>
+						<td colspan="2" style="text-align:center;height:50px;">
+							<input type="submit" name="logout" value="Logout" onclick="showLogout();" oncomplete="hideLogout();" />
+							<input type="submit" name="get_components" value="Get Components" onclick="hideTable();" oncomplete="showTable();" />
+						</td>
+					</tr>
+
+				{% else %}
+
+				<tr>
+					<td colspan="2">
+						<div role="alert" class="alert alert-danger">
+							{{ error_message }}
+							<br/><br/>
+							Please go <a href="/">back</a> and try again.
+						</div>
+					</td>
+				</tr>
+
+				{% endif %}
+
+			</table>
+
+			<div class="loading">
+
+				<div style="float:left;">
+					<img src="{{ STATIC_URL }}images/loading.gif" alt="Loading" title="Loading" />
+				</div>
+
+				<div style="float:left;margin-left:20px;">
+					<h1 style="font-size:1.5em;margin-top:20px;">Querying components...</h1>
+					<p>This can take a few minutes.</p>
+				</div>
+				
+			</div>
+
+			<div class="logging_out">
+				<div style="float:left;">
+					<img src="{{ STATIC_URL }}images/loading.gif" alt="Loading" title="Loading" />
+				</div>
+				<div style="float:left;margin-left:20px;">
+					<h1 style="font-size:1.5em;margin-top:20px;">Logging out...</h1>
+					<p>Revoking OAuth token.</p>
+				</div>
+			</div>
+
+			<div style="display:none;">
+				{{ login_form.environment }}
+				{{ login_form.access_token }}
+				{{ login_form.instance_url }}
+				{{ login_form.org_id }}
+			</div>
+
+		</form>
+
+	</table>
+
+{% endblock %}
